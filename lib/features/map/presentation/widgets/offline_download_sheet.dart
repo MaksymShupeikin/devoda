@@ -41,7 +41,7 @@ class OfflineDownloadSheet extends ConsumerStatefulWidget {
 }
 
 class _OfflineDownloadSheetState extends ConsumerState<OfflineDownloadSheet> {
-  double _radiusKm = 5;
+  double _radiusKm = 3;
 
   @override
   void initState() {
@@ -80,9 +80,9 @@ class _OfflineDownloadSheetState extends ConsumerState<OfflineDownloadSheet> {
         Text('Радиус: ${_radiusKm.round()} км', style: AppTextStyles.subtitle),
         Slider(
           value: _radiusKm,
-          min: 2,
-          max: 15,
-          divisions: 13,
+          min: 1,
+          max: 8,
+          divisions: 7,
           activeColor: AppColors.primary,
           label: '${_radiusKm.round()} км',
           onChanged: state.inProgress

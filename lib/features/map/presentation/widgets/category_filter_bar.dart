@@ -16,6 +16,7 @@ class CategoryFilterBar extends ConsumerWidget {
     return SizedBox(
       height: 56,
       child: ListView.separated(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         scrollDirection: Axis.horizontal,
         itemCount: WaterCategoryX.selectable.length,
         separatorBuilder: (_, _) => const SizedBox(width: 10),

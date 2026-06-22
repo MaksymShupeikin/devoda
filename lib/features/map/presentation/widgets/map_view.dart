@@ -52,6 +52,10 @@ class _MapViewState extends ConsumerState<MapView> {
         showAccuracyRing: true,
       ),
     );
+    // Hide default Mapbox branding ornaments (scale bar, attribution, logo)
+    await map.scaleBar.updateSettings(mb.ScaleBarSettings(enabled: false));
+    await map.attribution.updateSettings(mb.AttributionSettings(enabled: false));
+    await map.logo.updateSettings(mb.LogoSettings(enabled: false));
   }
 
   Future<void> _onStyleLoaded(mb.StyleLoadedEventData _) async {
@@ -237,21 +241,34 @@ class _MapViewState extends ConsumerState<MapView> {
         ),
 
         if (!_placementMode) ...[
-          const Positioned(
-            top: 0,
+          // Bottom darkening gradient & CategoryFilterBar
+          Positioned(
             left: 0,
             right: 0,
-            child: SafeArea(
-              bottom: false,
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(16, 12, 16, 0),
-                child: CategoryFilterBar(),
+            bottom: 0,
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.transparent,
+                    Colors.black.withValues(alpha: 0.25),
+                  ],
+                ),
+              ),
+              child: const SafeArea(
+                top: false,
+                child: Padding(
+                  padding: EdgeInsets.only(bottom: 20, top: 40),
+                  child: CategoryFilterBar(),
+                ),
               ),
             ),
           ),
           Positioned(
             right: 16,
-            bottom: 28,
+            bottom: 110,
             child: SafeArea(
               child: MapControls(
                 onLocate: _onLocatePressed,

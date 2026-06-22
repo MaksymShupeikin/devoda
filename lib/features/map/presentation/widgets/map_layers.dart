@@ -53,7 +53,7 @@ class MapLayers {
     double pixelRatio = 3.0,
   }) async {
     for (final category in WaterCategory.values) {
-      final rendered = await WidgetToImage.toRawRgba(
+      final rendered = await WidgetToImage.toPngBytes(
         MarkerCard(category: category),
         logicalSize: const Size(MarkerCard.width, MarkerCard.height),
         pixelRatio: pixelRatio,

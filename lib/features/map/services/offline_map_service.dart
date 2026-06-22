@@ -43,9 +43,11 @@ class OfflineMapService {
   Future<void> downloadAround({
     required double latitude,
     required double longitude,
-    double radiusKm = 5,
-    int minZoom = 10,
-    int maxZoom = 16,
+    double radiusKm = 3,
+    int minZoom = 11,
+    // Keep maxZoom modest: each extra zoom level ~4x the tiles, which quickly
+    // trips Mapbox's offline rate limit (HTTP 429) on rich styles.
+    int maxZoom = 15,
     void Function(double progress)? onProgress,
   }) async {
     final styleUri = Env.mapboxStyleUrl;

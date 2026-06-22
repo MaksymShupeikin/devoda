@@ -4,8 +4,12 @@ import 'dart:ui' as ui;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
-/// Raw RGBA pixels of a rendered widget, ready to be wrapped in a Mapbox
+/// PNG-encoded bytes of a rendered widget, ready to be wrapped in a Mapbox
 /// `MbxImage`.
+///
+/// The plugin decodes this data natively via `UIImage(data:)` (iOS) and
+/// `BitmapFactory.decodeByteArray` (Android), so the bytes must be an encoded
+/// image (PNG) rather than a raw pixel buffer.
 class RenderedImage {
   const RenderedImage({
     required this.widthPx,
@@ -23,12 +27,12 @@ class RenderedImage {
   /// Scale factor the image was rendered at.
   final double pixelRatio;
 
-  /// Tightly packed RGBA8888 bytes (`widthPx * heightPx * 4`).
+  /// PNG-encoded image bytes.
   final Uint8List bytes;
 }
 
-/// Rasterises an arbitrary Flutter widget into raw RGBA bytes entirely
-/// off-screen (the widget is never attached to the visible tree).
+/// Rasterises an arbitrary Flutter widget into a PNG image entirely off-screen
+/// (the widget is never attached to the visible tree).
 ///
 /// This lets us design map markers as ordinary Flutter widgets (cards, icons,
 /// gradients…) and hand the result to Mapbox as a style image, which is far
@@ -36,7 +40,7 @@ class RenderedImage {
 class WidgetToImage {
   WidgetToImage._();
 
-  static Future<RenderedImage> toRawRgba(
+  static Future<RenderedImage> toPngBytes(
     Widget widget, {
     required Size logicalSize,
     double pixelRatio = 3.0,
@@ -86,15 +90,18 @@ class WidgetToImage {
         await repaintBoundary.toImage(pixelRatio: pixelRatio);
     try {
       final byteData =
-          await image.toByteData(format: ui.ImageByteFormat.rawRgba);
+          await image.toByteData(format: ui.ImageByteFormat.png);
       if (byteData == null) {
-        throw StateError('Failed to rasterise widget to RGBA bytes.');
+        throw StateError('Failed to encode widget to PNG bytes.');
       }
       return RenderedImage(
         widthPx: image.width,
         heightPx: image.height,
         pixelRatio: pixelRatio,
-        bytes: byteData.buffer.asUint8List(),
+        bytes: byteData.buffer.asUint8List(
+          byteData.offsetInBytes,
+          byteData.lengthInBytes,
+        ),
       );
     } finally {
       image.dispose();
