@@ -66,5 +66,16 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Чтобы показать вас на карте и найти ближайшие точки с водой.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Чтобы показать вас на карте и найти ближайшие точки с водой.</string>
+	<!-- Allows opening Apple Maps / Google Maps for navigation. -->
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>comgooglemaps</string>
+		<string>maps</string>
+		<string>geo</string>
+	</array>
 </dict>
 </plist>
