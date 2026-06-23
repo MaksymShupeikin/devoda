@@ -3,21 +3,27 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/map_navigation.dart';
-import '../../../../core/utils/water_category.dart';
+import '../../../../core/l10n/app_localizations.dart';
+import '../../../../core/utils/app_notify.dart';
+import '../../../../core/utils/point_category.dart';
 import '../../../../core/widgets/app_button.dart';
+import '../../../../core/widgets/category_icon.dart';
 import '../../../../core/widgets/app_modal.dart';
 import '../../models/water_point.dart';
+import '../../../reports/presentation/widgets/report_section.dart';
 
-/// Details for a single water point, with a big "navigate" button that opens
-/// the device's default maps app.
 class PointDetailsSheet extends StatelessWidget {
   const PointDetailsSheet({super.key, required this.point});
 
   final WaterPoint point;
 
+  /// Inset re-added internally so the condition chips can scroll full-bleed.
+  static const double _inset = 20;
+
   static Future<void> show(BuildContext context, WaterPoint point) {
     return AppModal.showBottomSheet<void>(
       context: context,
+      horizontalPadding: 0,
       builder: (_) => PointDetailsSheet(point: point),
     );
   }
@@ -25,117 +31,211 @@ class PointDetailsSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final category = point.category;
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Container(
-              width: 56,
-              height: 56,
-              decoration: BoxDecoration(
-                color: category.color.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Icon(category.icon, color: category.color, size: 32),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
+    final maxHeight = MediaQuery.of(context).size.height * 0.82;
+    return SizedBox(
+      height: maxHeight,
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: SingleChildScrollView(
+              // Room so the last content isn't hidden behind the pinned bar.
+              padding: const EdgeInsets.only(bottom: 172),
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(point.displayName, style: AppTextStyles.title),
-                  const SizedBox(height: 2),
-                  Text(category.label, style: AppTextStyles.bodyMuted),
+                  // Padded content (everything except the full-bleed chips).
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: _inset),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              width: 56,
+                              height: 56,
+                              decoration: BoxDecoration(
+                                color: category.color.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Center(
+                                child: CategoryIcon(
+                                  category: category,
+                                  size: 32,
+                                  color: category.color,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    point.title(context.l10n),
+                                    style: AppTextStyles.title,
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    category.label(context.l10n),
+                                    style: AppTextStyles.bodyMuted,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                        _InfoRow(
+                          icon: Icons.accessible_outlined,
+                          label: context.l10n.accessibility,
+                          value: _yesNo(
+                            point.wheelchair,
+                            context.l10n,
+                            yes: context.l10n.hasRamp,
+                          ),
+                        ),
+                        _InfoRow(
+                          icon: Icons.payments_outlined,
+                          label: context.l10n.payment,
+                          value: _fee(point.fee, context.l10n),
+                        ),
+                        _InfoRow(
+                          icon: Icons.lock_open_outlined,
+                          label: context.l10n.accessLabel,
+                          value: _access(point.access, context.l10n),
+                        ),
+                        if (point.openingHours != null &&
+                            point.openingHours!.isNotEmpty)
+                          _InfoRow(
+                            icon: Icons.schedule_outlined,
+                            label: context.l10n.openingHours,
+                            value: point.openingHours!,
+                          ),
+                      ],
+                    ),
+                  ),
+                  // Condition selector (full-bleed) + reports history.
+                  if (point.id > 0)
+                    ReportSection(pointId: point.id, horizontalInset: _inset),
                 ],
               ),
             ),
-          ],
-        ),
-        const SizedBox(height: 18),
-        _InfoRow(
-          icon: Icons.accessible_rounded,
-          label: 'Доступность',
-          value: _yesNo(point.wheelchair, yes: 'Есть пандус/доступ'),
-        ),
-        _InfoRow(
-          icon: Icons.payments_rounded,
-          label: 'Оплата',
-          value: _fee(point.fee),
-        ),
-        _InfoRow(
-          icon: Icons.lock_open_rounded,
-          label: 'Доступ',
-          value: _access(point.access),
-        ),
-        if (point.openingHours != null && point.openingHours!.isNotEmpty)
-          _InfoRow(
-            icon: Icons.schedule_rounded,
-            label: 'Часы работы',
-            value: point.openingHours!,
           ),
-        const SizedBox(height: 22),
-        AppButton(
-          label: 'Проложить маршрут',
-          icon: Icons.directions_rounded,
-          onPressed: () => _navigate(context),
-        ),
-        const SizedBox(height: 10),
-        AppButton(
-          label: 'Закрыть',
-          variant: AppButtonVariant.secondary,
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      ],
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: _PinnedActions(
+              onNavigate: () => _navigate(context),
+              onClose: () => Navigator.of(context).pop(),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Future<void> _navigate(BuildContext context) async {
-    final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
     final navigator = Navigator.of(context);
     final ok = await MapNavigation.navigateTo(
       latitude: point.latitude,
       longitude: point.longitude,
-      label: point.displayName,
+      label: point.title(l10n),
     );
     navigator.pop();
     if (!ok) {
-      messenger.showSnackBar(
-        const SnackBar(content: Text('Не удалось открыть приложение карт')),
-      );
+      AppNotify.error(l10n.cantOpenMaps);
     }
   }
 
-  static String _yesNo(String? raw, {required String yes}) {
-    if (raw == null) return 'Нет данных';
-    return raw.toLowerCase() == 'yes' ? yes : 'Нет';
+  static String _yesNo(String? raw, AppLocalizations l, {required String yes}) {
+    if (raw == null) return l.noData;
+    return raw.toLowerCase() == 'yes' ? yes : l.no;
   }
 
-  static String _fee(String? raw) {
+  static String _fee(String? raw, AppLocalizations l) {
     switch (raw?.toLowerCase()) {
       case 'yes':
-        return 'Платно';
+        return l.paid;
       case 'no':
-        return 'Бесплатно';
+        return l.free;
       default:
-        return 'Нет данных';
+        return l.noData;
     }
   }
 
-  static String _access(String? raw) {
+  static String _access(String? raw, AppLocalizations l) {
     switch (raw?.toLowerCase()) {
       case 'yes':
       case 'public':
       case 'permissive':
-        return 'Свободный';
+        return l.accessFree;
       case 'private':
-        return 'Частный';
+        return l.accessPrivate;
       case 'customers':
-        return 'Для клиентов';
+        return l.accessCustomers;
       default:
-        return 'Нет данных';
+        return l.noData;
     }
+  }
+}
+
+/// Bottom-pinned action buttons with a white gradient fade so the scrolling
+/// content disappears smoothly underneath them.
+class _PinnedActions extends StatelessWidget {
+  const _PinnedActions({required this.onNavigate, required this.onClose});
+
+  final VoidCallback onNavigate;
+  final VoidCallback onClose;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        IgnorePointer(
+          child: Container(
+            height: 28,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  AppColors.surface.withValues(alpha: 0),
+                  AppColors.surface,
+                ],
+              ),
+            ),
+          ),
+        ),
+        ColoredBox(
+          color: AppColors.surface,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              children: [
+                AppButton(
+                  label: context.l10n.buildRoute,
+                  icon: Icons.directions_outlined,
+                  onPressed: onNavigate,
+                ),
+                const SizedBox(height: 12),
+                AppButton(
+                  label: context.l10n.close,
+                  variant: AppButtonVariant.secondary,
+                  onPressed: onClose,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
 

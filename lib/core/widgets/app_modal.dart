@@ -12,6 +12,8 @@ class AppModal {
     required WidgetBuilder builder,
     bool isScrollControlled = true,
     bool isDismissible = true,
+    // Set to 0 for full-bleed content (the sheet adds its own padding).
+    double horizontalPadding = 20,
   }) {
     return showModalBottomSheet<T>(
       context: context,
@@ -28,17 +30,28 @@ class AppModal {
           padding: EdgeInsets.only(bottom: bottomInset),
           child: SafeArea(
             top: false,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const _DragHandle(),
-                Flexible(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 4, 20, 20),
-                    child: builder(context),
+            // Tapping anywhere on the sheet (outside a field) dismisses the
+            // keyboard / drops focus.
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const _DragHandle(),
+                  Flexible(
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        horizontalPadding,
+                        4,
+                        horizontalPadding,
+                        20,
+                      ),
+                      child: builder(context),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );

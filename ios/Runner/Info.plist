@@ -24,8 +24,18 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>comgooglemaps</string>
+		<string>maps</string>
+		<string>geo</string>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Чтобы показать вас на карте и найти ближайшие точки с водой.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Чтобы показать вас на карте и найти ближайшие точки с водой.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
@@ -65,17 +75,6 @@
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Чтобы показать вас на карте и найти ближайшие точки с водой.</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Чтобы показать вас на карте и найти ближайшие точки с водой.</string>
-	<!-- Allows opening Apple Maps / Google Maps for navigation. -->
-	<key>LSApplicationQueriesSchemes</key>
-	<array>
-		<string>comgooglemaps</string>
-		<string>maps</string>
-		<string>geo</string>
 	</array>
 </dict>
 </plist>

@@ -8,7 +8,9 @@ class OnboardingController extends Notifier<bool> {
 
   @override
   bool build() {
-    return ref.read(sharedPreferencesProvider).getBool(_key) ?? false;
+    // TODO(test): Always return false to show onboarding on every app launch for testing.
+    return false;
+    // return ref.read(sharedPreferencesProvider).getBool(_key) ?? false;
   }
 
   Future<void> complete() async {

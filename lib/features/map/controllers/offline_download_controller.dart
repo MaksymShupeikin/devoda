@@ -63,7 +63,9 @@ class OfflineDownloadController extends Notifier<OfflineDownloadState> {
     if (state.inProgress) return;
     state = const OfflineDownloadState(inProgress: true, progress: 0);
     try {
-      await ref.read(offlineMapServiceProvider).downloadAround(
+      await ref
+          .read(offlineMapServiceProvider)
+          .downloadAround(
             latitude: latitude,
             longitude: longitude,
             radiusKm: radiusKm,
@@ -82,5 +84,5 @@ class OfflineDownloadController extends Notifier<OfflineDownloadState> {
 
 final offlineDownloadControllerProvider =
     NotifierProvider<OfflineDownloadController, OfflineDownloadState>(
-  OfflineDownloadController.new,
-);
+      OfflineDownloadController.new,
+    );

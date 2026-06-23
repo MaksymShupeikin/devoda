@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/l10n/app_localizations.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_button.dart';
@@ -33,17 +34,22 @@ class PlacementOverlay extends StatelessWidget {
               child: Material(
                 color: AppColors.primary,
                 borderRadius: BorderRadius.circular(18),
-                child: const Padding(
-                  padding: EdgeInsets.all(16),
+                elevation: 4,
+                shadowColor: AppColors.primary.withValues(alpha: 0.3),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
                   child: Row(
                     children: [
-                      Icon(Icons.touch_app_rounded,
-                          color: Colors.white, size: 28),
-                      SizedBox(width: 12),
+                      const Icon(
+                        Icons.touch_app_outlined,
+                        color: Colors.white,
+                        size: 28,
+                      ),
+                      const SizedBox(width: 12),
                       Expanded(
                         child: Text(
-                          'Подвиньте карту так, чтобы метка указывала на нужное место',
-                          style: TextStyle(
+                          context.l10n.placementHint,
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 18,
                             height: 1.3,
@@ -69,7 +75,11 @@ class PlacementOverlay extends StatelessWidget {
               size: 64,
               color: AppColors.primary,
               shadows: [
-                Shadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 3)),
+                Shadow(
+                  color: Colors.black26,
+                  blurRadius: 8,
+                  offset: Offset(0, 3),
+                ),
               ],
             ),
           ),
@@ -100,21 +110,21 @@ class PlacementOverlay extends StatelessWidget {
                   child: Column(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(8, 8, 8, 12),
+                        padding: const EdgeInsets.fromLTRB(8, 8, 8, 16),
                         child: Text(
-                          'Метка указывает на новое место?',
+                          context.l10n.placementConfirm,
                           textAlign: TextAlign.center,
                           style: AppTextStyles.subtitle,
                         ),
                       ),
                       AppButton(
-                        label: 'Поставить здесь',
-                        icon: Icons.check_circle_rounded,
+                        label: context.l10n.placeHere,
+                        icon: Icons.pin_drop_outlined,
                         onPressed: onConfirm,
                       ),
                       const SizedBox(height: 10),
                       AppButton(
-                        label: 'Отмена',
+                        label: context.l10n.cancel,
                         variant: AppButtonVariant.secondary,
                         onPressed: onCancel,
                       ),

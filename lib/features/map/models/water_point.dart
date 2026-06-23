@@ -1,4 +1,5 @@
-import '../../../core/utils/water_category.dart';
+import '../../../core/l10n/app_localizations.dart';
+import '../../../core/utils/point_category.dart';
 
 /// A single water point as stored in the Supabase `point` table.
 ///
@@ -48,12 +49,13 @@ class WaterPoint {
   );
 
   /// UI category derived from the OSM amenity (falling back to `type`).
-  WaterCategory get category =>
-      WaterCategoryX.fromAmenity(amenity ?? type);
+  PointCategory get category => PointCategoryX.fromAmenity(amenity ?? type);
 
-  /// Best human-readable title for the point.
-  String get displayName =>
-      (name != null && name!.trim().isNotEmpty) ? name!.trim() : category.label;
+  /// Best human-readable title for the point (localized).
+  String title(AppLocalizations l) =>
+      (name != null && name!.trim().isNotEmpty)
+          ? name!.trim()
+          : category.label(l);
 
   factory WaterPoint.fromJson(Map<String, dynamic> json) {
     return WaterPoint(

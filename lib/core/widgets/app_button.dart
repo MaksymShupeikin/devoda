@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
+import 'water_droplet_loader.dart';
 
 /// Large, high-contrast primary/secondary button tuned for older users.
 class AppButton extends StatelessWidget {
@@ -25,24 +26,17 @@ class AppButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isPrimary = variant == AppButtonVariant.primary;
-    final Color background =
-        isPrimary ? AppColors.primary : AppColors.surface;
-    final Color foreground =
-        isPrimary ? AppColors.textOnPrimary : AppColors.primary;
+    final Color background = isPrimary ? AppColors.primary : AppColors.surface;
+    final Color foreground = isPrimary
+        ? AppColors.textOnPrimary
+        : AppColors.primary;
 
     final child = Row(
       mainAxisSize: expanded ? MainAxisSize.max : MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         if (busy)
-          SizedBox(
-            width: 24,
-            height: 24,
-            child: CircularProgressIndicator(
-              strokeWidth: 3,
-              valueColor: AlwaysStoppedAnimation<Color>(foreground),
-            ),
-          )
+          WaterDropletLoader(size: 24, color: foreground)
         else ...[
           if (icon != null) ...[
             Icon(icon, size: 26, color: foreground),

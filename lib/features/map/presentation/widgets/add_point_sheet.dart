@@ -2,15 +2,17 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
-import '../../../../core/utils/water_category.dart';
+import '../../../../core/utils/point_category.dart';
+import '../../../../core/l10n/app_localizations.dart';
 import '../../../../core/widgets/app_button.dart';
+import '../../../../core/widgets/category_icon.dart';
 import '../../../../core/widgets/app_modal.dart';
 
 /// Result returned from the add-point form.
 class AddPointResult {
   const AddPointResult({required this.category, this.name});
 
-  final WaterCategory category;
+  final PointCategory category;
   final String? name;
 }
 
@@ -33,7 +35,7 @@ class AddPointSheet extends StatefulWidget {
 }
 
 class _AddPointSheetState extends State<AddPointSheet> {
-  WaterCategory _category = WaterCategory.drinkingWater;
+  PointCategory _category = PointCategory.drinkingWater;
   final _nameController = TextEditingController();
 
   @override
@@ -45,10 +47,7 @@ class _AddPointSheetState extends State<AddPointSheet> {
   void _submit() {
     final name = _nameController.text.trim();
     Navigator.of(context).pop(
-      AddPointResult(
-        category: _category,
-        name: name.isEmpty ? null : name,
-      ),
+      AddPointResult(category: _category, name: name.isEmpty ? null : name),
     );
   }
 
@@ -59,11 +58,11 @@ class _AddPointSheetState extends State<AddPointSheet> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Новая точка с водой', style: AppTextStyles.title),
-          const SizedBox(height: 4),
-          Text('Какой это тип?', style: AppTextStyles.bodyMuted),
-          const SizedBox(height: 14),
-          ...WaterCategoryX.selectable.map(
+          Text(context.l10n.newWaterPoint, style: AppTextStyles.title),
+          const SizedBox(height: 24),
+          Text(context.l10n.whichType, style: AppTextStyles.label),
+          const SizedBox(height: 12),
+          ...PointCategoryX.addable.map(
             (category) => Padding(
               padding: const EdgeInsets.only(bottom: 10),
               child: _CategoryOption(
@@ -73,30 +72,32 @@ class _AddPointSheetState extends State<AddPointSheet> {
               ),
             ),
           ),
+          const SizedBox(height: 24),
+          Text(context.l10n.nameOptional, style: AppTextStyles.label),
           const SizedBox(height: 12),
-          Text('Название (необязательно)', style: AppTextStyles.label),
-          const SizedBox(height: 8),
           TextField(
             controller: _nameController,
             style: AppTextStyles.body,
             textCapitalization: TextCapitalization.sentences,
             decoration: InputDecoration(
-              hintText: 'Например: Колонка во дворе',
+              hintText: context.l10n.nameHint,
               hintStyle: AppTextStyles.bodyMuted,
               filled: true,
               fillColor: AppColors.surfaceMuted,
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 18,
+                vertical: 18,
+              ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
                 borderSide: BorderSide.none,
               ),
             ),
           ),
-          const SizedBox(height: 22),
+          const SizedBox(height: 24),
           AppButton(
-            label: 'Сохранить точку',
-            icon: Icons.check_rounded,
+            label: context.l10n.savePoint,
+            icon: Icons.save_outlined,
             onPressed: _submit,
           ),
         ],
@@ -112,7 +113,7 @@ class _CategoryOption extends StatelessWidget {
     required this.onTap,
   });
 
-  final WaterCategory category;
+  final PointCategory category;
   final bool selected;
   final VoidCallback onTap;
 
@@ -143,17 +144,23 @@ class _CategoryOption extends StatelessWidget {
                   color: color.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: Icon(category.icon, color: color, size: 28),
+                child: Center(
+                  child: CategoryIcon(
+                    category: category,
+                    size: 30,
+                    color: color,
+                  ),
+                ),
               ),
               const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(category.label, style: AppTextStyles.subtitle),
+                    Text(category.label(context.l10n), style: AppTextStyles.subtitle),
                     const SizedBox(height: 2),
                     Text(
-                      category.description,
+                      category.description(context.l10n),
                       style: AppTextStyles.bodyMuted.copyWith(fontSize: 16),
                     ),
                   ],

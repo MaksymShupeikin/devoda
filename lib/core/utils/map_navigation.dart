@@ -15,9 +15,7 @@ class MapNavigation {
   }) async {
     final candidates = <Uri>[
       if (Platform.isIOS)
-        Uri.parse(
-          'http://maps.apple.com/?daddr=$latitude,$longitude&dirflg=d',
-        ),
+        Uri.parse('http://maps.apple.com/?daddr=$latitude,$longitude&dirflg=d'),
       if (Platform.isAndroid)
         Uri.parse('google.navigation:q=$latitude,$longitude&mode=d'),
       // geo: scheme — handled by most installed map apps.
@@ -34,8 +32,10 @@ class MapNavigation {
 
     for (final uri in candidates) {
       if (await canLaunchUrl(uri)) {
-        final launched =
-            await launchUrl(uri, mode: LaunchMode.externalApplication);
+        final launched = await launchUrl(
+          uri,
+          mode: LaunchMode.externalApplication,
+        );
         if (launched) return true;
       }
     }

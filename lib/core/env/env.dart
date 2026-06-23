@@ -16,8 +16,8 @@ class Env {
   /// Optional custom Mapbox style. Falls back to the Mapbox Standard style.
   static String get mapboxStyleUrl =>
       dotenv.maybeGet('MAPBOX_STYLE_URL')?.trim().isNotEmpty == true
-          ? dotenv.get('MAPBOX_STYLE_URL').trim()
-          : 'mapbox://styles/mapbox/standard';
+      ? dotenv.get('MAPBOX_STYLE_URL').trim()
+      : 'mapbox://styles/mapbox/standard';
 
   static String _require(String key) {
     final value = dotenv.maybeGet(key)?.trim();

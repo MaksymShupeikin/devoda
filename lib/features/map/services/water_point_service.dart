@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -10,20 +11,70 @@ class WaterPointService {
 
   final SupabaseClient _client;
 
-  static const String _table = 'point';
+  static const String _table = 'water_points';
 
   /// Fetches all active water points. The btree index on
   /// `(latitude, longitude)` plus the `status` index keep this fast.
   Future<List<WaterPoint>> fetchActive({int limit = 5000}) async {
-    final response = await _client
-        .from(_table)
-        .select()
-        .eq('status', 'active')
-        .limit(limit);
+    debugPrint(
+      '[devoda] WaterPointService: fetchActive starting query for table $_table...',
+    );
+    try {
+      final response = await _client
+          .from(_table)
+          .select()
+          .eq('status', 'active')
+          .limit(limit);
 
-    return (response as List)
-        .map((json) => WaterPoint.fromJson(json as Map<String, dynamic>))
-        .toList(growable: false);
+      final list = response as List;
+      debugPrint(
+        '[devoda] WaterPointService: fetchActive success. Returned ${list.length} rows.',
+      );
+      return list
+          .map((json) => WaterPoint.fromJson(json as Map<String, dynamic>))
+          .toList(growable: false);
+    } catch (e, st) {
+      debugPrint(
+        '[devoda] WaterPointService: fetchActive error: $e\nStacktrace: $st',
+      );
+      rethrow;
+    }
+  }
+
+  Future<WaterPoint> insertPoint({
+    required String amenity,
+    required String type,
+    required double latitude,
+    required double longitude,
+    String? name,
+  }) async {
+    final payload = <String, dynamic>{
+      'osm_id': 'manual:${DateTime.now().millisecondsSinceEpoch}',
+      'amenity': amenity,
+      'name': name,
+      'region': 'manual',
+      'tags': <String, dynamic>{},
+      'type': type,
+      'status': 'active',
+      'latitude': latitude,
+      'longitude': longitude,
+    };
+
+    debugPrint('[devoda] WaterPointService: insertPoint payload: $payload');
+    try {
+      final response = await _client
+          .from(_table)
+          .insert(payload)
+          .select()
+          .single();
+      debugPrint('[devoda] WaterPointService: insertPoint success.');
+      return WaterPoint.fromJson(response);
+    } catch (e, st) {
+      debugPrint(
+        '[devoda] WaterPointService: insertPoint error: $e\nStacktrace: $st',
+      );
+      rethrow;
+    }
   }
 }
 

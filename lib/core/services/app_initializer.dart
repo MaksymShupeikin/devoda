@@ -6,13 +6,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../env/env.dart';
 
-/// Centralized, ordered startup. Everything that must complete before
-/// `runApp` lives here, keeping `main()` minimal.
 class AppInitializer {
   AppInitializer._();
 
-  /// Runs all async startup work and returns the loaded [SharedPreferences],
-  /// which is then injected into the widget tree via a provider override.
   static Future<SharedPreferences> init() async {
     WidgetsFlutterBinding.ensureInitialized();
 

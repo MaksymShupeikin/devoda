@@ -25,11 +25,14 @@ class AppColors {
   // Feedback.
   static const Color success = Color(0xFF2E9E5B);
   static const Color danger = Color(0xFFE2533B);
+  static const Color warning = Color(0xFFE8821E);
   static const Color border = Color(0xFFD7E3EC);
 
-  // Category colors (one distinct hue per water-point type).
-  static const Color categoryDrinkingWater = Color(0xFF0A6CCB); // Бьювет
+  // Category colors (one distinct hue per point type).
+  static const Color categoryDrinkingWater = Color(0xFF0A6CCB); // Бювет
   static const Color categoryWaterPoint = Color(0xFF0E9C8A); // Водокачка
-  static const Color categoryVending = Color(0xFF7A5AF0); // Автомат
+  static const Color categoryResilience = Color(
+    0xFFE8821E,
+  ); // Пункт незламності
   static const Color categoryOther = Color(0xFF53697A);
 }

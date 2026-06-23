@@ -1,25 +1,29 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/utils/water_category.dart';
-
 /// The on-map marker, designed as a small "card" with a colored icon badge and
 /// a pointer tail. It is rendered off-screen into a bitmap (see
 /// [WidgetToImage]) and registered as a Mapbox style image, so the map can draw
 /// thousands of them cheaply.
+///
+/// [icon] is supplied by the caller (the rasterized category SVG), keeping this
+/// widget free of any category logic.
 class MarkerCard extends StatelessWidget {
-  const MarkerCard({super.key, required this.category});
+  const MarkerCard({super.key, required this.color, required this.icon});
 
-  final WaterCategory category;
+  final Color color;
+  final Widget icon;
 
   /// Logical size of the rendered marker. Height == card (52) + tail (12) so
   /// the tail tip lands exactly at the image bottom (IconAnchor.BOTTOM).
   static const double width = 60;
   static const double height = 64;
+
+  /// Size of the icon drawn inside the card.
+  static const double iconSize = 30;
   static const double _tailHeight = 12;
 
   @override
   Widget build(BuildContext context) {
-    final color = category.color;
     return SizedBox(
       width: width,
       height: height,
@@ -42,9 +46,7 @@ class MarkerCard extends StatelessWidget {
                 ),
               ],
             ),
-            child: Center(
-              child: Icon(category.icon, color: color, size: 30),
-            ),
+            child: Center(child: icon),
           ),
           // Pointer tail.
           CustomPaint(

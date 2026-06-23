@@ -12,15 +12,13 @@ class MapPage extends ConsumerWidget {
   static const String name = 'map';
 
   static GoRoute get route => GoRoute(
-        path: path,
-        name: name,
-        builder: (context, state) => const MapPage(),
-      );
+    path: path,
+    name: name,
+    builder: (context, state) => const MapPage(),
+  );
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return const Scaffold(
-      body: MapView(),
-    );
+    return const Scaffold(body: MapView());
   }
 }

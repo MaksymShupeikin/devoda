@@ -9,31 +9,23 @@ class LocationService {
   /// Ensures location services are on and permission is granted.
   /// Returns `true` when the app may read the position.
   Future<bool> ensurePermission() async {
-    final serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) return false;
-
-    var permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-    }
-    return permission == LocationPermission.always ||
-        permission == LocationPermission.whileInUse;
+    return true;
   }
 
-  /// Current position, or `null` when permission/services are unavailable.
+  /// Current position, mocked to be always in the center of Kharkiv.
   Future<Position?> currentPosition() async {
-    if (!await ensurePermission()) return null;
-    try {
-      return await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.high,
-          timeLimit: Duration(seconds: 12),
-        ),
-      );
-    } catch (_) {
-      // Fall back to the last known position if a fresh fix times out.
-      return Geolocator.getLastKnownPosition();
-    }
+    return Position(
+      longitude: 36.2304,
+      latitude: 49.9935,
+      timestamp: DateTime.now(),
+      accuracy: 10.0,
+      altitude: 100.0,
+      altitudeAccuracy: 1.0,
+      heading: 0.0,
+      headingAccuracy: 0.0,
+      speed: 0.0,
+      speedAccuracy: 0.0,
+    );
   }
 }
 

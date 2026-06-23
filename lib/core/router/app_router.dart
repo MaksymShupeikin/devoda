@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/map/presentation/pages/map_page.dart';
 import '../../features/onboarding/controllers/onboarding_controller.dart';
 import '../../features/onboarding/presentation/pages/onboarding_page.dart';
@@ -12,10 +13,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
 
   return GoRouter(
     initialLocation: seenOnboarding ? MapPage.path : OnboardingPage.path,
-    routes: [
-      OnboardingPage.route,
-      MapPage.route,
-    ],
+    routes: [OnboardingPage.route, MapPage.route, LoginPage.route],
     redirect: (context, state) {
       final seen = ref.read(onboardingControllerProvider);
       final atOnboarding = state.matchedLocation == OnboardingPage.path;

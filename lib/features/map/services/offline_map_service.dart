@@ -12,11 +12,7 @@ class OfflineMapService {
 
   /// Builds a square polygon (GeoJSON) of [radiusKm] half-side around the
   /// given center.
-  Map<String, Object?> _squareAround(
-    double lat,
-    double lng,
-    double radiusKm,
-  ) {
+  Map<String, Object?> _squareAround(double lat, double lng, double radiusKm) {
     const double kmPerDegLat = 111.0;
     final double kmPerDegLng =
         111.0 * math.cos(lat * math.pi / 180.0).abs().clamp(0.01, 1.0);

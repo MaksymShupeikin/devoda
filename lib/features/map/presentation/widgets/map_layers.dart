@@ -1,13 +1,15 @@
 import 'dart:convert';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 // Mapbox ships its own `Size` (pigeon) which would clash with dart:ui's Size.
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' hide Size;
 
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/utils/water_category.dart';
+import '../../../../core/utils/point_category.dart';
 import '../../../../core/utils/widget_to_image.dart';
-import '../../models/water_point.dart';
+import '../../models/map_marker.dart';
 import 'marker_card.dart';
 
 /// Source/layer ids and the helpers that wire a clustered GeoJSON layer stack
@@ -27,21 +29,28 @@ class MapLayers {
   }
 
   /// Builds the GeoJSON FeatureCollection string for the given points. Each
-  /// feature carries the registered marker image id in its `icon` property.
-  static String featureCollection(List<WaterPoint> points) {
-    final features = points
-        .map((p) => {
-              'type': 'Feature',
-              'geometry': {
-                'type': 'Point',
-                'coordinates': [p.longitude, p.latitude],
-              },
-              'properties': {
-                'id': p.id,
-                'icon': p.category.markerImageId,
-                'category': p.category.name,
-              },
-            })
+  /// feature carries the registered marker image id in its `icon` property and
+  /// a `selected` flag used to enlarge the tapped marker.
+  static String featureCollection(
+    List<MapMarker> markers, {
+    String? selectedId,
+  }) {
+    final features = markers
+        .map(
+          (m) => {
+            'type': 'Feature',
+            'geometry': {
+              'type': 'Point',
+              'coordinates': [m.longitude, m.latitude],
+            },
+            'properties': {
+              'id': m.featureId,
+              'icon': m.category.markerImageId,
+              'category': m.category.name,
+              'selected': m.featureId == selectedId,
+            },
+          },
+        )
         .toList();
     return jsonEncode({'type': 'FeatureCollection', 'features': features});
   }
@@ -52,9 +61,29 @@ class MapLayers {
     StyleManager style, {
     double pixelRatio = 3.0,
   }) async {
-    for (final category in WaterCategory.values) {
+    for (final category in PointCategory.values) {
+      // Rasterize the category SVG (tinted) and place it inside the card.
+      final iconImage = await _rasterizeSvg(
+        category.svgAsset,
+        color: category.color,
+        logicalSize: MarkerCard.iconSize,
+        pixelRatio: pixelRatio,
+      );
+      final Widget iconWidget = iconImage != null
+          ? RawImage(
+              image: iconImage,
+              width: MarkerCard.iconSize,
+              height: MarkerCard.iconSize,
+              fit: BoxFit.contain,
+            )
+          : Icon(
+              category.icon,
+              color: category.color,
+              size: MarkerCard.iconSize,
+            );
+
       final rendered = await WidgetToImage.toPngBytes(
-        MarkerCard(category: category),
+        MarkerCard(color: category.color, icon: iconWidget),
         logicalSize: const Size(MarkerCard.width, MarkerCard.height),
         pixelRatio: pixelRatio,
       );
@@ -71,6 +100,39 @@ class MapLayers {
         const <ImageStretches>[],
         null,
       );
+    }
+  }
+
+  /// Rasterizes an SVG asset into a tinted [ui.Image] at [logicalSize] logical
+  /// pixels (scaled by [pixelRatio] for crispness). Returns null on failure so
+  /// the caller can fall back to a Material glyph.
+  static Future<ui.Image?> _rasterizeSvg(
+    String assetPath, {
+    required Color color,
+    required double logicalSize,
+    required double pixelRatio,
+  }) async {
+    try {
+      final loader = SvgAssetLoader(
+        assetPath,
+        theme: SvgTheme(currentColor: color),
+      );
+      final info = await vg.loadPicture(loader, null);
+      final px = (logicalSize * pixelRatio).round();
+      final recorder = ui.PictureRecorder();
+      final canvas = ui.Canvas(recorder);
+      final src = info.size;
+      if (src.width > 0 && src.height > 0) {
+        canvas.scale(px / src.width, px / src.height);
+      }
+      canvas.drawPicture(info.picture);
+      final picture = recorder.endRecording();
+      final image = await picture.toImage(px, px);
+      info.picture.dispose();
+      picture.dispose();
+      return image;
+    } catch (_) {
+      return null;
     }
   }
 
@@ -144,10 +206,23 @@ class MapLayers {
           ['has', 'point_count'],
         ],
         iconImageExpression: ['get', 'icon'],
-        iconSize: 1.0,
+        // Tapped marker grows to ~1.45x; others stay at 1x.
+        iconSizeExpression: [
+          'case',
+          ['get', 'selected'],
+          1.45,
+          1.0,
+        ],
         iconAllowOverlap: true,
         iconIgnorePlacement: true,
         iconAnchor: IconAnchor.BOTTOM,
+        // Draw the selected marker above its neighbours.
+        symbolSortKeyExpression: [
+          'case',
+          ['get', 'selected'],
+          1.0,
+          0.0,
+        ],
       ),
     );
   }
@@ -156,12 +231,29 @@ class MapLayers {
   /// filter change).
   static Future<void> updateData(
     StyleManager style,
-    List<WaterPoint> points,
-  ) async {
+    List<MapMarker> markers, {
+    String? selectedId,
+  }) async {
     await style.setStyleSourceProperty(
       sourceId,
       'data',
-      featureCollection(points),
+      featureCollection(markers, selectedId: selectedId),
     );
+  }
+
+  /// Shows or hides every marker layer at once (used to clear the map while the
+  /// user is placing a new point).
+  static Future<void> setMarkersVisible(
+    StyleManager style,
+    bool visible,
+  ) async {
+    final value = visible ? 'visible' : 'none';
+    for (final layerId in const [
+      clusterCircleLayer,
+      clusterCountLayer,
+      unclusteredLayer,
+    ]) {
+      await style.setStyleLayerProperty(layerId, 'visibility', value);
+    }
   }
 }

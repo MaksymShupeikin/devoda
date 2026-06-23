@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_localizations.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_button.dart';
@@ -17,10 +18,10 @@ class OnboardingPage extends ConsumerStatefulWidget {
   static const String name = 'onboarding';
 
   static GoRoute get route => GoRoute(
-        path: path,
-        name: name,
-        builder: (context, state) => const OnboardingPage(),
-      );
+    path: path,
+    name: name,
+    builder: (context, state) => const OnboardingPage(),
+  );
 
   @override
   ConsumerState<OnboardingPage> createState() => _OnboardingPageState();
@@ -30,34 +31,30 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   final _controller = PageController();
   int _index = 0;
 
-  static const _slides = <OnboardingSlide>[
+  static const int _slideCount = 3;
+
+  List<OnboardingSlide> _buildSlides(AppLocalizations l) => [
     OnboardingSlide(
-      icon: Icons.map_rounded,
+      imagePath: 'assets/onboarding/onboarding_1.png',
       accent: AppColors.categoryDrinkingWater,
-      title: 'Вода рядом с вами',
-      description:
-          'На карте сразу видны бьюветы, водокачки и автоматы с водой '
-          'поблизости.',
+      title: l.onb1Title,
+      description: l.onb1Desc,
     ),
     OnboardingSlide(
-      icon: Icons.directions_rounded,
+      imagePath: 'assets/onboarding/onboarding_2.png',
       accent: AppColors.categoryWaterPoint,
-      title: 'Маршрут в один шаг',
-      description:
-          'Нажмите на метку, посмотрите детали и проложите маршрут через '
-          'привычное приложение карт.',
+      title: l.onb2Title,
+      description: l.onb2Desc,
     ),
     OnboardingSlide(
-      icon: Icons.add_location_alt_rounded,
-      accent: AppColors.categoryVending,
-      title: 'Добавляйте и берите с собой',
-      description:
-          'Отметьте новый источник воды и скачайте карту, чтобы она работала '
-          'без интернета.',
+      imagePath: 'assets/onboarding/onboarding_3.png',
+      accent: AppColors.categoryResilience,
+      title: l.onb3Title,
+      description: l.onb3Desc,
     ),
   ];
 
-  bool get _isLast => _index == _slides.length - 1;
+  bool get _isLast => _index == _slideCount - 1;
 
   @override
   void dispose() {
@@ -84,6 +81,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final slides = _buildSlides(l10n);
     return Scaffold(
       backgroundColor: AppColors.surface,
       body: SafeArea(
@@ -92,15 +91,19 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
             Align(
               alignment: Alignment.centerRight,
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 4,
+                ),
                 child: _isLast
                     ? const SizedBox(height: 48)
                     : TextButton(
                         onPressed: _finish,
                         child: Text(
-                          'Пропустить',
-                          style: AppTextStyles.body
-                              .copyWith(color: AppColors.textSecondary),
+                          l10n.onbSkip,
+                          style: AppTextStyles.body.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
                         ),
                       ),
               ),
@@ -108,19 +111,18 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
             Expanded(
               child: PageView.builder(
                 controller: _controller,
-                itemCount: _slides.length,
+                itemCount: slides.length,
                 onPageChanged: (i) => setState(() => _index = i),
-                itemBuilder: (_, i) => _slides[i],
+                itemBuilder: (_, i) => slides[i],
               ),
             ),
             const SizedBox(height: 12),
-            _Dots(count: _slides.length, active: _index),
+            _Dots(count: slides.length, active: _index),
             const SizedBox(height: 24),
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
               child: AppButton(
-                label: _isLast ? 'Понятно, начать' : 'Далее',
-                icon: _isLast ? Icons.check_rounded : Icons.arrow_forward_rounded,
+                label: _isLast ? l10n.onbStart : l10n.onbNext,
                 onPressed: _next,
               ),
             ),

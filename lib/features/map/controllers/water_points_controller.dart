@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/utils/water_category.dart';
+import '../../../core/utils/point_category.dart';
 import '../models/water_point.dart';
 import '../services/water_point_cache.dart';
 import '../services/water_point_service.dart';
@@ -47,9 +47,28 @@ class WaterPointsController extends AsyncNotifier<List<WaterPoint>> {
     }
   }
 
-  /// Optimistically adds a locally created point (mock submission flow) and
-  /// persists it to the offline cache.
-  Future<void> addLocalMock(WaterPoint point) async {
+  /// Inserts a new water point into Supabase, then optimistically adds it to
+  /// the visible list and offline cache. Throws if the insert fails (e.g. RLS).
+  ///
+  /// The real row (with its server id) replaces the optimistic copy on the next
+  /// refresh.
+  Future<void> addWaterPoint({
+    required String amenity,
+    required String type,
+    required double latitude,
+    required double longitude,
+    String? name,
+  }) async {
+    final point = await ref
+        .read(waterPointServiceProvider)
+        .insertPoint(
+          amenity: amenity,
+          type: type,
+          latitude: latitude,
+          longitude: longitude,
+          name: name,
+        );
+
     final current = state.valueOrNull ?? const <WaterPoint>[];
     final updated = [...current, point];
     state = AsyncData(updated);
@@ -59,27 +78,15 @@ class WaterPointsController extends AsyncNotifier<List<WaterPoint>> {
 
 final waterPointsControllerProvider =
     AsyncNotifierProvider<WaterPointsController, List<WaterPoint>>(
-  WaterPointsController.new,
-);
-
-/// Points after applying the active category filter. The `other` bucket is
-/// always shown since it is not user-filterable.
-final filteredWaterPointsProvider = Provider<List<WaterPoint>>((ref) {
-  final points = ref.watch(waterPointsControllerProvider).valueOrNull ??
-      const <WaterPoint>[];
-  final selected = ref.watch(mapFilterControllerProvider);
-  return points.where((p) {
-    final category = p.category;
-    return category == WaterCategory.other || selected.contains(category);
-  }).toList(growable: false);
-});
+      WaterPointsController.new,
+    );
 
 /// Selected categories. All are enabled by default.
-class MapFilterController extends Notifier<Set<WaterCategory>> {
+class MapFilterController extends Notifier<Set<PointCategory>> {
   @override
-  Set<WaterCategory> build() => WaterCategoryX.selectable.toSet();
+  Set<PointCategory> build() => PointCategoryX.selectable.toSet();
 
-  void toggle(WaterCategory category) {
+  void toggle(PointCategory category) {
     final next = {...state};
     if (next.contains(category)) {
       // Keep at least one category enabled.
@@ -91,10 +98,10 @@ class MapFilterController extends Notifier<Set<WaterCategory>> {
     state = next;
   }
 
-  bool isSelected(WaterCategory category) => state.contains(category);
+  bool isSelected(PointCategory category) => state.contains(category);
 }
 
 final mapFilterControllerProvider =
-    NotifierProvider<MapFilterController, Set<WaterCategory>>(
-  MapFilterController.new,
-);
+    NotifierProvider<MapFilterController, Set<PointCategory>>(
+      MapFilterController.new,
+    );

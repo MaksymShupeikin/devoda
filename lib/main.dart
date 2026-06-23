@@ -9,9 +9,7 @@ Future<void> main() async {
   final prefs = await AppInitializer.init();
   runApp(
     ProviderScope(
-      overrides: [
-        sharedPreferencesProvider.overrideWithValue(prefs),
-      ],
+      overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
       child: const DevodaApp(),
     ),
   );

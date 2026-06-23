@@ -33,18 +33,13 @@ class WaterPointCache {
 
   DateTime? lastUpdated() {
     final millis = _prefs.getInt(_updatedKey);
-    return millis == null
-        ? null
-        : DateTime.fromMillisecondsSinceEpoch(millis);
+    return millis == null ? null : DateTime.fromMillisecondsSinceEpoch(millis);
   }
 
   Future<void> save(List<WaterPoint> points) async {
     final encoded = jsonEncode(points.map((p) => p.toJson()).toList());
     await _prefs.setString(_pointsKey, encoded);
-    await _prefs.setInt(
-      _updatedKey,
-      DateTime.now().millisecondsSinceEpoch,
-    );
+    await _prefs.setInt(_updatedKey, DateTime.now().millisecondsSinceEpoch);
   }
 }
 

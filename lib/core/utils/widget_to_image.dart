@@ -86,11 +86,11 @@ class WidgetToImage {
       ..flushCompositingBits()
       ..flushPaint();
 
-    final ui.Image image =
-        await repaintBoundary.toImage(pixelRatio: pixelRatio);
+    final ui.Image image = await repaintBoundary.toImage(
+      pixelRatio: pixelRatio,
+    );
     try {
-      final byteData =
-          await image.toByteData(format: ui.ImageByteFormat.png);
+      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
       if (byteData == null) {
         throw StateError('Failed to encode widget to PNG bytes.');
       }
