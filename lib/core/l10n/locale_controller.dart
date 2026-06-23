@@ -6,7 +6,7 @@ import '../services/preferences_service.dart';
 /// Current app locale, persisted in SharedPreferences. Defaults to Ukrainian.
 class LocaleController extends Notifier<Locale> {
   static const String _key = 'app_locale_v1';
-  static const Locale _fallback = Locale('uk');
+  static const Locale _fallback = Locale('en');
 
   @override
   Locale build() {

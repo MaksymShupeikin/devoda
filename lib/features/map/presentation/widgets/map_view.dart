@@ -80,32 +80,37 @@ class _MapViewState extends ConsumerState<MapView> {
     final map = _map;
     if (map == null) return;
 
-    await MapLayers.registerMarkerImages(map.style);
-    await MapLayers.install(
-      map.style,
-      initialData: MapLayers.featureCollection(ref.read(mapMarkersProvider)),
-    );
+    try {
+      await MapLayers.registerMarkerImages(map.style);
+      await MapLayers.install(
+        map.style,
+        initialData: MapLayers.featureCollection(ref.read(mapMarkersProvider)),
+      );
 
-    // Tap interactions bound to our layers hand the feature straight to the
-    // callback (no manual query). Fixed ids keep re-registration idempotent.
-    map.addInteraction(
-      mb.TapInteraction(
-        mb.FeaturesetDescriptor(layerId: MapLayers.unclusteredLayer),
-        (feature, _) => _handlePointTap(feature),
-      ),
-      interactionID: 'water-point-tap',
-    );
-    map.addInteraction(
-      mb.TapInteraction(
-        mb.FeaturesetDescriptor(layerId: MapLayers.clusterCircleLayer),
-        (feature, _) => _handleClusterTap(feature),
-      ),
-      interactionID: 'water-cluster-tap',
-    );
-
-    if (!mounted) return;
-    setState(() => _styleReady = true);
-    await _moveToUserLocation(animate: false);
+      // Tap interactions bound to our layers hand the feature straight to the
+      // callback (no manual query). Fixed ids keep re-registration idempotent.
+      map.addInteraction(
+        mb.TapInteraction(
+          mb.FeaturesetDescriptor(layerId: MapLayers.unclusteredLayer),
+          (feature, _) => _handlePointTap(feature),
+        ),
+        interactionID: 'water-point-tap',
+      );
+      map.addInteraction(
+        mb.TapInteraction(
+          mb.FeaturesetDescriptor(layerId: MapLayers.clusterCircleLayer),
+          (feature, _) => _handleClusterTap(feature),
+        ),
+        interactionID: 'water-cluster-tap',
+      );
+    } catch (e, st) {
+      debugPrint('[devoda] _onStyleLoaded error: $e\n$st');
+    } finally {
+      if (mounted) {
+        setState(() => _styleReady = true);
+        await _moveToUserLocation(animate: false);
+      }
+    }
   }
 
   Future<void> _moveToUserLocation({bool animate = true}) async {
