@@ -32,6 +32,7 @@ class PointDetailsSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final category = point.category;
     final maxHeight = MediaQuery.of(context).size.height * 0.82;
+    final infoRows = _buildInfoRows(context);
     return SizedBox(
       height: maxHeight,
       child: Stack(
@@ -87,8 +88,11 @@ class PointDetailsSheet extends StatelessWidget {
                             ),
                           ],
                         ),
-                        ..._buildInfoRows(context),
-                        const SizedBox(height: 12),
+                        ...infoRows,
+                        // Breathing room only when there are no info rows — with
+                        // data present the divider's own top space is enough, so
+                        // the last row sits closer to the separator line.
+                        if (infoRows.isEmpty) const SizedBox(height: 12),
                       ],
                     ),
                   ),
