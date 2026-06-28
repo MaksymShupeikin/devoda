@@ -110,6 +110,8 @@ class AppLocalizations {
       _('Ще немає повідомлень. Будьте першим!', 'No reports yet. Be the first!');
   String get someUser => _('Користувач', 'User');
   String get you => _('Ви', 'You');
+  String get reportNoWater =>
+      _('Повідомити про відсутність води', 'Report no water source');
 
   // ---- Offline ----
   String get offlineTitle => _('Мапа без інтернету', 'Offline map');

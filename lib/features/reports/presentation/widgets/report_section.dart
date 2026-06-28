@@ -77,9 +77,7 @@ class _ReportSectionState extends ConsumerState<ReportSection> {
     } catch (e) {
       if (!mounted) return;
       setState(() => _submitting = false);
-      AppNotify.error(
-        e is PostgrestException ? e.message : l10n.reportFailed,
-      );
+      AppNotify.error(e is PostgrestException ? e.message : l10n.reportFailed);
     }
   }
 
@@ -138,7 +136,7 @@ class _ReportSectionState extends ConsumerState<ReportSection> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Divider(height: 32, color: AppColors.border),
+              const Divider(height: 48, color: AppColors.border),
               Text(context.l10n.whatState, style: AppTextStyles.subtitle),
               const SizedBox(height: 4),
               Text(
@@ -167,8 +165,10 @@ class _ReportSectionState extends ConsumerState<ReportSection> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const SizedBox(height: 6),
+              _NoWaterButton(onTap: () {}),
               if (_selected != null) ...[
-                const SizedBox(height: 14),
+                const SizedBox(height: 10),
                 TextField(
                   controller: _noteController,
                   style: AppTextStyles.body,
@@ -208,8 +208,10 @@ class _ReportSectionState extends ConsumerState<ReportSection> {
                 reports.when(
                   data: (items) => _HistoryList(
                     reports: items,
-                    currentUserId:
-                        ref.read(authServiceProvider).currentUser?.id,
+                    currentUserId: ref
+                        .read(authServiceProvider)
+                        .currentUser
+                        ?.id,
                   ),
                   loading: () => const Padding(
                     padding: EdgeInsets.symmetric(vertical: 16),
@@ -227,6 +229,50 @@ class _ReportSectionState extends ConsumerState<ReportSection> {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Subtle, low-emphasis action to flag that a point has no water. Greyish so it
+/// doesn't compete with the primary condition chips above it.
+class _NoWaterButton extends StatelessWidget {
+  const _NoWaterButton({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(12),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.only(right: 10, top: 8, bottom: 8),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.outlined_flag_rounded,
+                  size: 20,
+                  color: AppColors.textSecondary,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  context.l10n.reportNoWater,
+                  style: AppTextStyles.bodyMuted.copyWith(
+                    fontSize: 15,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -343,10 +389,7 @@ class _HistoryList extends StatelessWidget {
     if (reports.isEmpty) {
       return Padding(
         padding: const EdgeInsets.only(bottom: 12),
-        child: Text(
-          context.l10n.noReportsYet,
-          style: AppTextStyles.bodyMuted,
-        ),
+        child: Text(context.l10n.noReportsYet, style: AppTextStyles.bodyMuted),
       );
     }
     return Column(
@@ -371,7 +414,10 @@ class _HistoryList extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      ReportConditionX.labelForValue(r.reportedCondition, context.l10n),
+                      ReportConditionX.labelForValue(
+                        r.reportedCondition,
+                        context.l10n,
+                      ),
                       style: AppTextStyles.body.copyWith(
                         fontWeight: FontWeight.w700,
                         color: color,

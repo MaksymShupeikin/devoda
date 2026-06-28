@@ -87,33 +87,8 @@ class PointDetailsSheet extends StatelessWidget {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 24),
-                        _InfoRow(
-                          icon: Icons.accessible_outlined,
-                          label: context.l10n.accessibility,
-                          value: _yesNo(
-                            point.wheelchair,
-                            context.l10n,
-                            yes: context.l10n.hasRamp,
-                          ),
-                        ),
-                        _InfoRow(
-                          icon: Icons.payments_outlined,
-                          label: context.l10n.payment,
-                          value: _fee(point.fee, context.l10n),
-                        ),
-                        _InfoRow(
-                          icon: Icons.lock_open_outlined,
-                          label: context.l10n.accessLabel,
-                          value: _access(point.access, context.l10n),
-                        ),
-                        if (point.openingHours != null &&
-                            point.openingHours!.isNotEmpty)
-                          _InfoRow(
-                            icon: Icons.schedule_outlined,
-                            label: context.l10n.openingHours,
-                            value: point.openingHours!,
-                          ),
+                        ..._buildInfoRows(context),
+                        const SizedBox(height: 12),
                       ],
                     ),
                   ),
@@ -138,6 +113,58 @@ class PointDetailsSheet extends StatelessWidget {
     );
   }
 
+  /// Builds the info rows, including only those whose data is present.
+  List<Widget> _buildInfoRows(BuildContext context) {
+    final l10n = context.l10n;
+    final rows = <Widget>[];
+
+    final accessibility = _yesNo(point.wheelchair, l10n, yes: l10n.hasRamp);
+    if (accessibility != null) {
+      rows.add(
+        _InfoRow(
+          icon: Icons.accessible_outlined,
+          label: l10n.accessibility,
+          value: accessibility,
+        ),
+      );
+    }
+
+    final fee = _fee(point.fee, l10n);
+    if (fee != null) {
+      rows.add(
+        _InfoRow(
+          icon: Icons.payments_outlined,
+          label: l10n.payment,
+          value: fee,
+        ),
+      );
+    }
+
+    final access = _access(point.access, l10n);
+    if (access != null) {
+      rows.add(
+        _InfoRow(
+          icon: Icons.lock_open_outlined,
+          label: l10n.accessLabel,
+          value: access,
+        ),
+      );
+    }
+
+    if (point.openingHours != null && point.openingHours!.isNotEmpty) {
+      rows.add(
+        _InfoRow(
+          icon: Icons.schedule_outlined,
+          label: l10n.openingHours,
+          value: point.openingHours!,
+        ),
+      );
+    }
+
+    if (rows.isEmpty) return rows;
+    return [const SizedBox(height: 24), ...rows];
+  }
+
   Future<void> _navigate(BuildContext context) async {
     final l10n = context.l10n;
     final navigator = Navigator.of(context);
@@ -152,23 +179,27 @@ class PointDetailsSheet extends StatelessWidget {
     }
   }
 
-  static String _yesNo(String? raw, AppLocalizations l, {required String yes}) {
-    if (raw == null) return l.noData;
+  static String? _yesNo(
+    String? raw,
+    AppLocalizations l, {
+    required String yes,
+  }) {
+    if (raw == null || raw.isEmpty) return null;
     return raw.toLowerCase() == 'yes' ? yes : l.no;
   }
 
-  static String _fee(String? raw, AppLocalizations l) {
+  static String? _fee(String? raw, AppLocalizations l) {
     switch (raw?.toLowerCase()) {
       case 'yes':
         return l.paid;
       case 'no':
         return l.free;
       default:
-        return l.noData;
+        return null;
     }
   }
 
-  static String _access(String? raw, AppLocalizations l) {
+  static String? _access(String? raw, AppLocalizations l) {
     switch (raw?.toLowerCase()) {
       case 'yes':
       case 'public':
@@ -179,7 +210,7 @@ class PointDetailsSheet extends StatelessWidget {
       case 'customers':
         return l.accessCustomers;
       default:
-        return l.noData;
+        return null;
     }
   }
 }
