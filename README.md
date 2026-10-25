@@ -1,77 +1,106 @@
-# Devoda — Карта джерел води 💧
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/brand/devoda-logo-dark.svg">
+    <img src="docs/brand/devoda-logo.svg" alt="Devoda" height="72">
+  </picture>
+</p>
 
-Сучасний Flutter-додаток для пошуку та додавання бюветів, водокачек, автоматів з водою та пунктів незламності. Карта реалізована на базі Mapbox Maps SDK, а бекенд та авторизація працюють на Supabase. Інтерфейс адаптований для будь-якого віку, включаючи старше покоління (великі елементи керування, висока контрастність).
+<p align="center">
+  <b>Where can I get drinking water nearby?</b><br>
+  A map of public wells, water pumps, water vending machines and Invincibility Points — built to be easy to use at any age.
+</p>
+
+<p align="center">
+  <a href="#-key-features"><img alt="Platform: iOS and Android" src="https://img.shields.io/badge/platform-iOS%20%C2%B7%20Android-0A6CCB?style=for-the-badge"></a>
+  <a href="#-key-features"><img alt="Languages: English and Ukrainian" src="https://img.shields.io/badge/languages-EN%20%C2%B7%20UK-12222F?style=for-the-badge"></a>
+</p>
+
+<p align="center">
+  <img alt="Flutter" src="https://img.shields.io/badge/Flutter-02569B?logo=flutter&logoColor=white">
+  <img alt="Dart" src="https://img.shields.io/badge/Dart-0175C2?logo=dart&logoColor=white">
+  <img alt="Riverpod" src="https://img.shields.io/badge/Riverpod-2-0A6CCB">
+  <img alt="GoRouter" src="https://img.shields.io/badge/GoRouter-17-18B6E6">
+  <img alt="Mapbox" src="https://img.shields.io/badge/Mapbox-000000?logo=mapbox&logoColor=white">
+  <img alt="Supabase" src="https://img.shields.io/badge/Supabase-3FCF8E?logo=supabase&logoColor=white">
+  <img alt="PostgreSQL" src="https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=white">
+  <img alt="OpenStreetMap" src="https://img.shields.io/badge/OpenStreetMap-7EBC6F?logo=openstreetmap&logoColor=white">
+  <img alt="Material 3" src="https://img.shields.io/badge/Material%203-757575?logo=materialdesign&logoColor=white">
+  <img alt="iOS" src="https://img.shields.io/badge/iOS-000000?logo=apple&logoColor=white">
+  <img alt="Android" src="https://img.shields.io/badge/Android-3DDC84?logo=android&logoColor=black">
+</p>
+
+A modern Flutter app for finding and adding public wells, water pumps, water vending machines and Invincibility Points. The map is built on the Mapbox Maps SDK, while the backend and authentication run on Supabase. The interface is designed for users of every age, including older people (large controls, high contrast).
 
 ---
 
-## 🚀 Основні можливості
+## 🚀 Key Features
 
-- **Інтерактивна карта Mapbox:** Швидка візуалізація тисяч точок через гео-кластеризацію на рівні стилю Mapbox (Symbol/Circle layers).
-- **Кастомні маркери-віджети:** Рендеринг карток-маркерів виконується на льоту через off-screen растровий рендерер ([WidgetToImage](file:///Users/mshupeikin/Projects/devoda/lib/core/utils/widget_to_image.dart)) для максимальної продуктивності.
-- **Анімований лоадер-крапля:** Кастомний індикатор завантаження карти у формі краплі води, реалізований через `CustomPainter` та синусоїдальні хвилі рідини.
-- **Двомовність (Localization):** Базова мова додатку — **англійська** (з можливістю миттєвого перемикання на українську прямо з головного екрана).
-- **Безпечна авторизація (Phone + OTP):** Вхід за номером телефону за допомогою пакету `pinput` (розумне поле вводу автоматично розпізнає та форматує українські номери `+380` та американські тестові номери `+1 800`).
-- **Скарги та відгуки (Reports):** Можливість повідомити про стан джерела (наприклад, "Немає води", "Зламано"), дані зберігаються в Supabase із каскадним видаленням при видаленні точки.
-- **Робота в офлайні:** Кешування точок у локальне сховище (`SharedPreferences`) + можливість завантаження офлайн-тайлів карти вибраної області.
-
----
-
-## 🛠 Технологічний стек
-
-* **Фреймворк:** Flutter (iOS / Android)
-* **Керування станом:** [Riverpod](https://riverpod.dev) (виключно **ручне** декларування провайдерів без генерації коду — `@riverpod` та `build_runner` не використовуються).
-* **База даних & Auth:** [Supabase](https://supabase.com) (PostgreSQL, GoTrue Auth, Realtime).
-* **Навігація:** [GoRouter](https://pub.dev/packages/go_router) з декларативними правилами та Auth Guards.
-* **Стилізація:** Vanilla Flutter (Material 3).
+- **Interactive Mapbox map:** Thousands of points render quickly thanks to geo-clustering at the Mapbox style level (Symbol/Circle layers).
+- **Custom widget markers:** Marker cards are rendered on the fly by an off-screen raster renderer ([WidgetToImage](lib/core/utils/widget_to_image.dart)) for maximum performance.
+- **Animated water-drop loader:** A custom map loading indicator shaped like a drop of water, built with `CustomPainter` and sine-wave liquid motion.
+- **Two languages (localization):** The app's base language is **English**, and you can switch to Ukrainian instantly right from the home screen.
+- **Secure sign-in (Phone + OTP):** Sign in with your phone number using the `pinput` package (the smart input field automatically recognizes and formats Ukrainian `+380` numbers and US `+1 800` test numbers).
+- **Reports and feedback:** Report the state of a water source (e.g. "No water", "Broken"). Reports are stored in Supabase and are deleted in cascade when the point is deleted.
+- **Offline mode:** Points are cached in local storage (`SharedPreferences`), and map tiles for a selected area can be downloaded for offline use.
 
 ---
 
-## 📁 Архітектура проекту
+## 🛠 Tech Stack
 
-Проект розділений на ізольовані фічі (`features/`) та загальне ядро (`core/`). Кожна фіча організована за шарами:
+* **Framework:** Flutter (iOS / Android)
+* **State management:** [Riverpod](https://riverpod.dev) (providers are declared **manually** only, without code generation — `@riverpod` and `build_runner` are not used).
+* **Database & Auth:** [Supabase](https://supabase.com) (PostgreSQL, GoTrue Auth, Realtime).
+* **Navigation:** [GoRouter](https://pub.dev/packages/go_router) with declarative rules and Auth Guards.
+* **Styling:** Vanilla Flutter (Material 3).
+
+---
+
+## 📁 Project Architecture
+
+The project is split into isolated features (`features/`) and a shared core (`core/`). Each feature is organized into layers:
 ```text
 lib/
-├── core/                         # Спільний код додатка
-│   ├── l10n/                     # Локалізація (AppLocalizations)
-│   ├── theme/                    # Дизайн-система (кольори, шрифти)
-│   ├── services/                 # Глобальні сервіси (Supabase, Location)
-│   └── widgets/                  # Спільні UI-компоненти (AppButton, лоадери)
+├── core/                         # Code shared across the app
+│   ├── l10n/                     # Localization (AppLocalizations)
+│   ├── theme/                    # Design system (colors, fonts)
+│   ├── services/                 # Global services (Supabase, Location)
+│   └── widgets/                  # Shared UI components (AppButton, loaders)
 │
-└── features/                     # Бізнес-фічі додатка
-    ├── auth/                     # Вхід, перевірка OTP коду
-    ├── map/                      # Логіка карти, відображення маркерів, фильтри
-    ├── onboarding/               # Навчальні слайди при першому запуску
-    ├── reports/                  # Повідомлення про стан джерел води
-    └── resilience/               # Пункти незламності
+└── features/                     # Business features of the app
+    ├── auth/                     # Sign-in, OTP code verification
+    ├── map/                      # Map logic, marker rendering, filters
+    ├── onboarding/               # Tutorial slides on first launch
+    ├── reports/                  # Reports on the state of water sources
+    └── resilience/               # Invincibility Points
 ```
 
-Шари всередині фічі:
-1. `models/` — чисті Dart-моделі (мануальні `fromJson`/`toJson`, `copyWith`, `operator ==` та `hashCode`).
-2. `services/` — чисті запити до Supabase без збереження стану.
-3. `controllers/` — `Notifier` / `AsyncNotifier` (стейт-менеджмент інтерфейсу).
-4. `presentation/` — сторінки (`pages/`) та компоненти (`widgets/`).
+Layers inside a feature:
+1. `models/` — plain Dart models (hand-written `fromJson`/`toJson`, `copyWith`, `operator ==` and `hashCode`).
+2. `services/` — stateless Supabase queries.
+3. `controllers/` — `Notifier` / `AsyncNotifier` (UI state management).
+4. `presentation/` — pages (`pages/`) and components (`widgets/`).
 
 ---
 
-## ⚙️ Локальне налаштування
+## ⚙️ Local Setup
 
-### 1. Перемінні оточення (.env)
-Створіть файл `.env` у корені проекту та заповніть його (приклади знаходяться в `.env.example`):
+### 1. Environment variables (.env)
+Create a `.env` file in the project root and fill it in (see `.env.example` for examples):
 ```ini
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_ANON_KEY=your-supabase-anon-key
 MAPBOX_PUBLIC_TOKEN=pk.your-mapbox-public-token
 MAPBOX_STYLE_URL=mapbox://styles/your-username/your-style-id
 ```
-> ⚠️ **Важливо:** Переконайтеся, що наприкінці `MAPBOX_STYLE_URL` немає сторонніх символів або кириличних літер (наприклад, `ф`), інакше Mapbox видасть помилку 404 і мапа не завантажиться.
+> ⚠️ **Important:** Make sure there are no stray characters or Cyrillic letters (e.g. `ф`) at the end of `MAPBOX_STYLE_URL`, otherwise Mapbox returns a 404 error and the map won't load.
 
-### 2. Mapbox Downloads Token (для збірки під iOS/Android)
-Для завантаження нативного Mapbox SDK додайте секретний токен (формату `sk.***` з дозволом `DOWNLOADS:READ`):
-- **Android:** в `~/.gradle/gradle.properties`:
+### 2. Mapbox Downloads Token (for iOS/Android builds)
+To download the native Mapbox SDK, add a secret token (in `sk.***` format, with the `DOWNLOADS:READ` scope):
+- **Android:** in `~/.gradle/gradle.properties`:
   ```properties
   MAPBOX_DOWNLOADS_TOKEN=sk.your_secret_token
   ```
-- **iOS:** в `~/.netrc`:
+- **iOS:** in `~/.netrc`:
   ```text
   machine api.mapbox.com
     login mapbox
@@ -80,11 +109,11 @@ MAPBOX_STYLE_URL=mapbox://styles/your-username/your-style-id
 
 ---
 
-## 🗄 Структура бази даних & RLS (Supabase SQL)
+## 🗄 Database Structure & RLS (Supabase SQL)
 
-Для коректної роботи додатку база даних Supabase повинна мати наступні таблиці, зв'язки, політики безпеки (RLS) та тригери.
+For the app to work correctly, the Supabase database needs the following tables, relations, security policies (RLS) and triggers.
 
-### 1. Таблиця `water_points` (Джерела води)
+### 1. `water_points` table (water sources)
 ```sql
 CREATE TABLE public.water_points (
   id bigint GENERATED BY DEFAULT AS IDENTITY (START WITH 400) NOT NULL,
@@ -106,22 +135,22 @@ CREATE TABLE public.water_points (
   CONSTRAINT water_points_pkey PRIMARY KEY (id)
 );
 
--- Включаємо RLS
+-- Enable RLS
 ALTER TABLE public.water_points ENABLE ROW LEVEL SECURITY;
 
--- Дозволяємо SELECT для всіх (і гостей, і авторизованих)
+-- Allow SELECT for everyone (guests and signed-in users)
 CREATE POLICY "Allow select for everyone" 
   ON public.water_points FOR SELECT 
   USING (status IN ('active', 'reported'));
 
--- Дозволяємо INSERT тільки для авторизованих користувачів
+-- Allow INSERT for signed-in users only
 CREATE POLICY "Allow insert for authenticated users" 
   ON public.water_points FOR INSERT 
   TO authenticated 
   WITH CHECK (true);
 ```
 
-### 2. Таблиця `report` (Жалоби та стан джерел)
+### 2. `report` table (reports on the state of sources)
 ```sql
 CREATE TABLE public.report (
   id bigserial NOT NULL,
@@ -136,36 +165,36 @@ CREATE TABLE public.report (
   created_at timestamp with time zone NOT NULL DEFAULT now(),
   
   CONSTRAINT report_pkey PRIMARY KEY (id),
-  -- Каскадне видалення жалоб при видаленні точки води
+  -- Delete reports in cascade when the water point is deleted
   CONSTRAINT report_point_id_fkey FOREIGN KEY (point_id) REFERENCES public.water_points (id) ON DELETE CASCADE,
   CONSTRAINT report_admin_id_fkey FOREIGN KEY (admin_id) REFERENCES auth.users (id) ON DELETE SET NULL,
   CONSTRAINT report_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users (id) ON DELETE SET NULL
 ) TABLESPACE pg_default;
 
--- Індекси
+-- Indexes
 CREATE INDEX IF NOT EXISTS report_point_id_idx ON public.report USING btree (point_id);
 CREATE INDEX IF NOT EXISTS report_status_idx ON public.report USING btree (status);
 CREATE INDEX IF NOT EXISTS report_user_id_idx ON public.report USING btree (user_id);
 
--- Налаштування RLS
+-- RLS setup
 ALTER TABLE public.report ENABLE ROW LEVEL SECURITY;
 
--- Читати відгуки можуть усі
+-- Everyone can read reports
 CREATE POLICY "Allow select for everyone" 
   ON public.report FOR SELECT 
   USING (true);
 
--- Створювати відгуки можуть тільки увійшовши під своїм UID
+-- Reports can only be created when signed in, under your own UID
 CREATE POLICY "Allow insert for authenticated users" 
   ON public.report FOR INSERT 
   TO authenticated 
   WITH CHECK (auth.uid() = user_id);
 ```
 
-### 3. Автоматичний тригер оновлення статусу точки при скарзі
-При додаванні скарги в таблицю `report`, статус відповідного джерела води автоматично змінюється на `reported`.
+### 3. Trigger that updates a point's status when it is reported
+When a report is added to the `report` table, the status of the matching water source automatically changes to `reported`.
 
-**Функція тригера:**
+**Trigger function:**
 ```sql
 CREATE OR REPLACE FUNCTION public.on_report_insert()
  RETURNS trigger
@@ -173,7 +202,7 @@ CREATE OR REPLACE FUNCTION public.on_report_insert()
  SECURITY DEFINER
 AS $function$
 begin
-  -- Оновлюємо статус джерела в таблиці water_points
+  -- Update the source's status in the water_points table
   update public.water_points 
   set status = 'reported' 
   where id = new.point_id;
@@ -183,7 +212,7 @@ end;
 $function$;
 ```
 
-**Створення тригера:**
+**Creating the trigger:**
 ```sql
 CREATE TRIGGER on_report_insert
 AFTER INSERT ON public.report
@@ -193,38 +222,37 @@ EXECUTE FUNCTION on_report_insert();
 
 ---
 
-## 🧑‍💻 Корисні команди розробника
+## 🧑‍💻 Useful Developer Commands
 
-- **Форматування коду:** `dart format .`
-- **Аналіз проекту:** `flutter analyze`
-- **Запуск у режимі розробки:** `flutter run`
-- **Генерація конфігурацій iOS (SPM):** `flutter build ios --config-only`
+- **Format code:** `dart format .`
+- **Analyze the project:** `flutter analyze`
+- **Run in development mode:** `flutter run`
+- **Generate iOS configuration (SPM):** `flutter build ios --config-only`
 
 ---
 
-## 🎨 Стандарти розробки & Правила коду
+## 🎨 Development Standards & Code Rules
 
-Для збереження чистоти проекту та простоти паралельної розробки діють наступні правила (детальніше див. у [AGENTS.md](file:///Users/mshupeikin/Projects/devoda/AGENTS.md)):
+To keep the project clean and parallel development simple, the following rules apply (see [AGENTS.md](AGENTS.md) for details):
 
-### 1. Riverpod та відсутність генерації коду
-* Всі провайдери оголошуються **вручну** (`Provider`, `NotifierProvider`, `AsyncNotifierProvider`).
-* Використання генераторів коду (на кшталт `build_runner`, `@riverpod`) **суворо заборонено**. Це запобігає конфліктам злиття (merge conflicts) у згенерованих файлах `.g.dart`.
+### 1. Riverpod without code generation
+* All providers are declared **manually** (`Provider`, `NotifierProvider`, `AsyncNotifierProvider`).
+* Code generators (such as `build_runner` or `@riverpod`) are **strictly forbidden**. This prevents merge conflicts in generated `.g.dart` files.
 
-### 2. Вимоги до моделей даних
-Кожна модель повинна реалізовувати:
-- Метод `copyWith` для збереження імутабельності стану.
-- Перевизначення `operator ==` та `hashCode` для порівняння об'єктів за значенням (Value Equality), що запобігає зайвим перебудовам UI.
-- Метод `toString()` для зручного логування та налагодження.
-- Константне початкове значення `static const ... empty`.
+### 2. Data model requirements
+Every model must implement:
+- A `copyWith` method, to keep state immutable.
+- Overrides of `operator ==` and `hashCode` for value equality, which prevents unnecessary UI rebuilds.
+- A `toString()` method for convenient logging and debugging.
+- A constant initial value, `static const ... empty`.
 
-### 3. Правила побудови інтерфейсу (UI)
-* **Повторне використання:** Використовуйте спільні компоненти з `lib/core/widgets/` (наприклад, `AppButton`, лоадери, текстові поля).
-* **Чистота build-методів:** Не пишіть великі вкладені дерева віджетів. Якщо файл перевищує 300-400 рядків, виділяйте піделементи в окремі класи `ConsumerWidget` / `StatelessWidget` у `presentation/widgets/`.
-* **Жодної бізнес-логіки в UI:** У віджетах дозволені лише виклики контролерів та прості UI-тригери. Будь-які розрахунки, валідація та форматування мають відбуватися в контролерах (`Controller`) або сервісах (`Service`).
-* **Модальні вікна:** Будь-які Bottom Sheets повинні відкриватися виключно через загальний утилітарний метод `AppModal.showBottomSheet`.
+### 3. UI rules
+* **Reuse:** Use the shared components in `lib/core/widgets/` (e.g. `AppButton`, loaders, text fields).
+* **Clean build methods:** Don't write large nested widget trees. If a file grows past 300–400 lines, extract sub-elements into separate `ConsumerWidget` / `StatelessWidget` classes in `presentation/widgets/`.
+* **No business logic in the UI:** Widgets may only call controllers and fire simple UI triggers. All calculations, validation and formatting belong in controllers (`Controller`) or services (`Service`).
+* **Modals:** All bottom sheets must be opened only through the shared utility method `AppModal.showBottomSheet`.
 
-### 4. Навігація (GoRouter)
-* **Децентралізація:** Кожна сторінка оголошує свій маршрут як статичний геттер `route` всередині свого класу. Головний роутер (`lib/core/router/app_router.dart`) лише імпортує їх та реєструє.
-* **Навігація за ім'ям:** Використовуйте `context.goNamed(...)` замість прямих рядкових шляхів.
-* **Авторизація:** Обмеження доступу (Auth Guards) налаштовуються реактивно на рівні гвардів самого `GoRouter`, без імперативних перевірок всередині екранів.
-
+### 4. Navigation (GoRouter)
+* **Decentralized:** Each page declares its route as a static `route` getter inside its own class. The main router (`lib/core/router/app_router.dart`) only imports and registers them.
+* **Navigate by name:** Use `context.goNamed(...)` instead of raw string paths.
+* **Authorization:** Access restrictions (Auth Guards) are configured reactively at the level of `GoRouter`'s own guards, without imperative checks inside screens.
